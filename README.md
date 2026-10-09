@@ -1,6 +1,6 @@
-# Tra cứu KTV 4.0
+# NGÂN HÀNG CÂU HỎI VNPT
 
-Web tra cứu nhanh Ngân hàng câu hỏi KTV 4.0 (VNPT) — 3.785 câu, 19 phần thi.
+Web tra cứu nhanh NGÂN HÀNG CÂU HỎI VNPT
 
 - Ô tìm kiếm sticky trên đầu, hiển thị kết quả ngay khi gõ
 - Tìm kiếm thông minh: không phân biệt dấu, không phân biệt hoa thường, lọc theo từng từ
