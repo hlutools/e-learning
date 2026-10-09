@@ -75,11 +75,14 @@
 <footer>Ngân hàng câu hỏi KTV 4.0 (VNPT) · Tra cứu nhanh offline sau khi tải trang</footer>
 
 <script>var CHUNKS=[];</script>
+<script src="data/s.js"></script>
 <script src="data/d1.js"></script>
 <script src="data/d2.js"></script>
 <script src="data/d3.js"></script>
 <script src="data/d4.js"></script>
 <script src="data/d5.js"></script>
+<script src="data/d6.js"></script>
+<script src="data/d7.js"></script>
 <script>
 "use strict";
 /* ---------- chuẩn hoá tiếng Việt: bỏ dấu, đ→d ---------- */
@@ -88,17 +91,19 @@ const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;
 
 /* ---------- nạp dữ liệu ---------- */
 const DATA = [];
-let SECTIONS = new Set();
+let SECTIONS_SET = new Set();
 for (const c of CHUNKS) for (const r of c) {
-  const [s,n,q,a,pa,src,warn] = r;
+  const s = SECTIONS[r[0]], n = r[1], q = r[2], a = r[3],
+        pa = r[4].map(p => [p[0], p[1], p[2] >= 0 ? SOURCES[p[2]] : ""]),
+        src = r[5] >= 0 ? SOURCES[r[5]] : "", warn = r[6] === 1;
   const ansText = a + " " + pa.map(p=>p[1]).join(" ");
   const it = {s,n,q,a,pa,src,warn,
     _q: norm(q), _a: norm(ansText), _s: norm(s)};
   it._t = it._q + " " + it._a + " " + it._s;
-  DATA.push(it); SECTIONS.add(s);
+  DATA.push(it); SECTIONS_SET.add(s);
 }
 document.getElementById("totalLine").textContent =
-  DATA.length.toLocaleString("vi-VN") + " câu hỏi · " + SECTIONS.size + " phần thi";
+  DATA.length.toLocaleString("vi-VN") + " câu hỏi · " + SECTIONS_SET.size + " phần thi";
 
 /* ---------- highlight không phân biệt dấu ---------- */
 const DIA = {a:"aàáạảãâầấậẩẫăằắặẳẵ", e:"eèéẹẻẽêềếệểễ", i:"iìíịỉĩ",
