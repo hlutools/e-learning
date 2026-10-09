@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tra cứu KTV 4.0</title>
+<style>
+  :root{
+    --blue:#0b6bcb; --blue-dark:#095aa9; --bg:#f4f6f9; --card:#ffffff;
+    --text:#1c2733; --muted:#6b7a8d; --green:#0e7a3d; --green-bg:#e8f6ee;
+    --warn:#b26a00; --warn-bg:#fff6e5; --line:#e3e9f0; --radius:12px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+       background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+  header{position:sticky;top:0;z-index:50;background:var(--blue);color:#fff;
+         padding:14px 16px 16px;box-shadow:0 2px 10px rgba(0,0,0,.18)}
+  .wrap{max-width:860px;margin:0 auto;padding:0 16px}
+  header h1{margin:0 0 2px;font-size:19px;font-weight:700;letter-spacing:.2px}
+  header .sub{font-size:12.5px;opacity:.9;margin-bottom:10px}
+  .searchbox{position:relative}
+  .searchbox input{width:100%;padding:13px 44px 13px 42px;font-size:16px;border:0;border-radius:999px;
+    outline:none;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+  .searchbox .icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:18px;opacity:.55;pointer-events:none}
+  .searchbox .clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:#e8edf3;
+    width:28px;height:28px;border-radius:50%;font-size:15px;color:#556;cursor:pointer;display:none;line-height:1}
+  .searchbox .clear:hover{background:#d5dde7}
+  main .wrap{padding-top:14px;padding-bottom:60px}
+  #stats{font-size:13px;color:var(--muted);margin:2px 2px 12px}
+  #stats b{color:var(--blue-dark)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+        padding:14px 16px;margin-bottom:10px;box-shadow:0 1px 2px rgba(20,40,70,.05)}
+  .sec{display:inline-block;font-size:11.5px;font-weight:600;color:var(--blue-dark);
+       background:#e7f1fc;border-radius:999px;padding:3px 10px;margin-bottom:8px}
+  .q{font-size:15.5px;font-weight:600;line-height:1.55;margin:0 0 8px}
+  .a{font-size:14.5px;line-height:1.6;background:var(--green-bg);border-left:3px solid var(--green);
+     border-radius:0 8px 8px 0;padding:8px 12px;margin:0}
+  .a .lbl{font-weight:700;color:var(--green)}
+  .warnbox{background:var(--warn-bg);border-left:3px solid var(--warn);border-radius:0 8px 8px 0;
+     padding:8px 12px;margin:0;font-size:14.5px;line-height:1.6}
+  .warnbox .lbl{font-weight:700;color:var(--warn)}
+  .pa{margin:6px 0 0;padding:0;list-style:none}
+  .pa li{margin:6px 0;padding:8px 10px;background:#fff;border:1px solid #f0dfb8;border-radius:8px;font-size:14px;line-height:1.55}
+  .pa li b{color:var(--warn)}
+  .pa .psrc{display:block;font-size:12px;color:var(--muted);margin-top:3px}
+  .src{font-size:12px;color:var(--muted);margin-top:8px}
+  mark{background:#fff3b0;color:inherit;border-radius:3px;padding:0 1px}
+  .empty{text-align:center;color:var(--muted);padding:60px 20px;font-size:15px;line-height:1.7}
+  .empty .big{font-size:42px;margin-bottom:10px}
+  #more{display:block;width:100%;margin:6px 0 20px;padding:12px;border:1px solid var(--line);
+    background:#fff;border-radius:var(--radius);font-size:15px;font-weight:600;color:var(--blue-dark);cursor:pointer}
+  #more:hover{background:#eef4fb}
+  footer{text-align:center;color:var(--muted);font-size:12px;padding:18px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>🔍 Tra cứu KTV 4.0</h1>
+    <div class="sub" id="totalLine">Đang tải dữ liệu…</div>
+    <div class="searchbox">
+      <span class="icon">⌕</span>
+      <input id="q" type="search" placeholder="Gõ từ khóa để tra cứu… (không phân biệt dấu)" autocomplete="off" autofocus>
+      <button class="clear" id="clearBtn" title="Xóa">✕</button>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="wrap">
+    <div id="stats"></div>
+    <div id="results"></div>
+    <button id="more" style="display:none"></button>
+  </div>
+</main>
+<footer>Ngân hàng câu hỏi KTV 4.0 (VNPT) · Tra cứu nhanh offline sau khi tải trang</footer>
+
+<script>var CHUNKS=[];</script>
+<script src="data/d1.js"></script>
+<script src="data/d2.js"></script>
+<script src="data/d3.js"></script>
+<script src="data/d4.js"></script>
+<script src="data/d5.js"></script>
+<script>
+"use strict";
+/* ---------- chuẩn hoá tiếng Việt: bỏ dấu, đ→d ---------- */
+const norm = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/đ/g,"d");
+const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+
+/* ---------- nạp dữ liệu ---------- */
+const DATA = [];
+let SECTIONS = new Set();
+for (const c of CHUNKS) for (const r of c) {
+  const [s,n,q,a,pa,src,warn] = r;
+  const ansText = a + " " + pa.map(p=>p[1]).join(" ");
+  const it = {s,n,q,a,pa,src,warn,
+    _q: norm(q), _a: norm(ansText), _s: norm(s)};
+  it._t = it._q + " " + it._a + " " + it._s;
+  DATA.push(it); SECTIONS.add(s);
+}
+document.getElementById("totalLine").textContent =
+  DATA.length.toLocaleString("vi-VN") + " câu hỏi · " + SECTIONS.size + " phần thi";
+
+/* ---------- highlight không phân biệt dấu ---------- */
+const DIA = {a:"aàáạảãâầấậẩẫăằắặẳẵ", e:"eèéẹẻẽêềếệểễ", i:"iìíịỉĩ",
+  o:"oòóọỏõôồốộổỗơờớợởỡ", u:"uùúụủũưừứựửữ", y:"yỳýỵỷỹ", d:"dđ"};
+function tokenPattern(t){
+  let p = "";
+  for (const ch of t) p += DIA[ch] ? "["+DIA[ch]+"]" : ch.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+  return p;
+}
+function highlight(text, tokens){
+  let h = esc(text);
+  const pats = tokens.map(tokenPattern).filter(Boolean);
+  if (!pats.length) return h;
+  const re = new RegExp("(" + pats.join("|") + ")","gi");
+  return h.replace(re, "<mark>$1</mark>");
+}
+
+/* ---------- tìm kiếm thông minh ---------- */
+function search(query){
+  const nq = norm(query.trim());
+  if (!nq) return [];
+  const tokens = nq.split(/[^a-z0-9đ]+/i).filter(t => t.length >= 2 || /^\d+$/.test(t));
+  if (!tokens.length) return [];
+  const out = [];
+  for (const it of DATA){
+    let score = 0, ok = true;
+    for (const t of tokens){
+      const iq = it._q.indexOf(t), ia = it._a.indexOf(t), is = it._s.indexOf(t);
+      if (iq < 0 && ia < 0 && is < 0){ ok = false; break; }
+      if (iq >= 0) score += 6 - Math.min(5, iq/40);
+      else if (ia >= 0) score += 3 - Math.min(2, ia/60);
+      else score += 1;
+    }
+    if (!ok) continue;
+    if (it._t.indexOf(nq) >= 0) score += 12;      /* khớp nguyên cụm */
+    if (it._q.indexOf(nq) >= 0) score += 8;
+    out.push([score, it]);
+  }
+  out.sort((x,y)=> y[0]-x[0] || x[1].n - y[1].n);
+  return out.map(x=>x[1]);
+}
+
+/* ---------- render ---------- */
+const input = document.getElementById("q"),
+      results = document.getElementById("results"),
+      stats = document.getElementById("stats"),
+      moreBtn = document.getElementById("more"),
+      clearBtn = document.getElementById("clearBtn");
+let matches = [], shown = 0, curTokens = [];
+const PAGE = 60;
+
+function card(it, tokens){
+  let body;
+  if (it.warn && it.pa.length){
+    const lis = it.pa.map(p =>
+      "<li><b>Phương án " + p[0] + ":</b> " + highlight(p[1], tokens) +
+      (p[2] ? '<span class="psrc">Nguồn: ' + esc(p[2]) + "</span>" : "") + "</li>").join("");
+    body = '<div class="warnbox"><span class="lbl">⚠ Các nguồn ghi đáp án khác nhau</span><ul class="pa">' + lis + "</ul></div>";
+  } else {
+    body = '<p class="a"><span class="lbl">Đáp án: </span>' + highlight(it.a, tokens) + "</p>";
+  }
+  return '<article class="card"><span class="sec">' + esc(it.s) + "</span>" +
+    '<p class="q">' + highlight(it.q, tokens) + "</p>" + body +
+    (it.src ? '<div class="src">Nguồn: ' + esc(it.src) + "</div>" : "") + "</article>";
+}
+
+function renderMore(){
+  const slice = matches.slice(shown, shown + PAGE);
+  results.insertAdjacentHTML("beforeend", slice.map(it => card(it, curTokens)).join(""));
+  shown += slice.length;
+  if (shown < matches.length){
+    moreBtn.style.display = "block";
+    moreBtn.textContent = "Xem thêm (" + (matches.length - shown).toLocaleString("vi-VN") + " kết quả)";
+  } else moreBtn.style.display = "none";
+}
+
+let timer = null;
+function doSearch(){
+  const v = input.value;
+  clearBtn.style.display = v ? "block" : "none";
+  const nq = norm(v.trim());
+  curTokens = nq.split(/[^a-z0-9đ]+/i).filter(t => t.length >= 2 || /^\d+$/.test(t));
+  if (!nq || !curTokens.length){
+    matches = []; shown = 0; results.innerHTML = "";
+    moreBtn.style.display = "none";
+    stats.innerHTML = "";
+    results.innerHTML = '<div class="empty"><div class="big">📚</div>' +
+      "Gõ từ khóa vào ô tìm kiếm ở trên để tra cứu ngay.<br>" +
+      "Tìm kiếm <b>không phân biệt dấu</b>, không phân biệt hoa thường.<br>" +
+      "Ví dụ: <i>cap quang</i>, <i>dia chi ip</i>, <i>cap do 3</i>, <i>chuyen doi so</i></div>";
+    return;
+  }
+  matches = search(v);
+  shown = 0; results.innerHTML = "";
+  if (!matches.length){
+    stats.innerHTML = "";
+    results.innerHTML = '<div class="empty"><div class="big">🔎</div>Không tìm thấy kết quả cho "<b>' +
+      esc(v.trim()) + '</b>".<br>Thử từ khóa khác hoặc bỏ dấu.</div>';
+    moreBtn.style.display = "none";
+    return;
+  }
+  stats.innerHTML = "Tìm thấy <b>" + matches.length.toLocaleString("vi-VN") + "</b> kết quả";
+  renderMore();
+}
+input.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(doSearch, 120); });
+moreBtn.addEventListener("click", renderMore);
+clearBtn.addEventListener("click", () => { input.value = ""; input.focus(); doSearch(); });
+document.addEventListener("keydown", e => { if (e.key === "/" && document.activeElement !== input){ e.preventDefault(); input.focus(); } });
+doSearch();
+</script>
+</body>
+</html>
