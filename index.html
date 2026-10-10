@@ -53,10 +53,10 @@
 <header>
   <div class="wrap">
     <h1>🔍 NGÂN HÀNG CÂU HỎI VNPT</h1>
-    <div class="sub" id="totalLine">Đang tải dữ liệu…</div>
+    <div class="sub">Dữ liệu được tổng hợp từ nhiều nguồn</div>
     <div class="searchbox">
       <span class="icon">⌕</span>
-      <input id="q" type="search" placeholder="Gõ từ khóa để tra cứu… (không phân biệt dấu)" autocomplete="off" autofocus>
+      <input id="q" type="text" placeholder="Gõ từ khóa để tra cứu… (không phân biệt dấu)" autocomplete="off" autofocus>
       <button class="clear" id="clearBtn" title="Xóa">✕</button>
     </div>
   </div>
@@ -101,8 +101,7 @@ for (const c of CHUNKS) for (const r of c) {
   it._t = it._q + " " + it._a + " " + it._s;
   DATA.push(it); SECTIONS_SET.add(s);
 }
-document.getElementById("totalLine").textContent =
-  DATA.length.toLocaleString("vi-VN") + " câu hỏi · " + SECTIONS_SET.size + " phần thi";
+
 
 /* ---------- highlight không phân biệt dấu ---------- */
 const DIA = {a:"aàáạảãâầấậẩẫăằắặẳẵ", e:"eèéẹẻẽêềếệểễ", i:"iìíịỉĩ",
