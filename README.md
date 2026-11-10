@@ -4,6 +4,6 @@ Web tra cứu nhanh HLU QUESTIONS BANK
 - Tìm kiếm thông minh: không phân biệt dấu, không phân biệt hoa thường, lọc theo từng từ
 - Highlight từ khóa trong câu hỏi và đáp án
 - Static site, chạy trên GitHub Pages: https://hlutools.github.io/e-learning
-- App App Android bọc WebView với tên: HLU QUESTIONS BANK
+- App Android bọc WebView với tên: HLU QUESTIONS BANK
 
 
